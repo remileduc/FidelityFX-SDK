@@ -63,6 +63,15 @@ FFX_FORWARD_DECLARE(FfxInterface);
 /// @ingroup FfxInterface
 #define FFX_SDK_MAKE_VERSION( major, minor, patch ) ( ( major << 22 ) | ( minor << 12 ) | patch )
 
+// enum values should match
+// enum FfxApiConfigureFrameGenerationSwapChainKeyDX12
+// and
+// enum FfxApiConfigureFrameGenerationSwapChainKeyVK
+typedef enum FfxFrameInterpolationSwapchainConfigureKey
+{
+    FFX_FI_SWAPCHAIN_CONFIGURE_KEY_WAITCALLBACK = 0
+} FfxFrameInterpolationSwapchainConfigureKey;
+
 /// Stand in type for FfxPass
 ///
 /// These will be defined for each effect individually (i.e. FfxFsr2Pass).

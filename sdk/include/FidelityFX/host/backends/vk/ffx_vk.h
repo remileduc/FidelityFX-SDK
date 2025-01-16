@@ -300,11 +300,13 @@ FFX_API FfxResource ffxGetFrameinterpolationTextureVK(FfxSwapchain gameSwapChain
 /// @ingroup VKFrameInterpolation
 FFX_API FfxErrorCode ffxSetFrameGenerationConfigToSwapchainVK(FfxFrameGenerationConfig const* config);
 
+#if 0  // Now defined in header FidelityFX/host/ffx_interface.h
 //enum values should match enum FfxApiConfigureFrameGenerationSwapChainKeyVK
 typedef enum FfxFrameInterpolationSwapchainConfigureKey
 {
     FFX_FI_SWAPCHAIN_CONFIGURE_KEY_WAITCALLBACK = 0
 } FfxFrameInterpolationSwapchainConfigureKey;
+#endif
 
 /// Configures <c><i>FfxSwapchain</i></c> via KeyValue API post <c><i>FfxSwapchain</i></c> context creation
 ///
