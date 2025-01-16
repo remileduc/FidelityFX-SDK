@@ -97,6 +97,7 @@ void RegisterConstantBufferAllocatorDX12(FfxInterface* backendInterface, FfxCons
 // Constant buffer allocation callback
 static FfxConstantBufferAllocator s_fpConstantAllocator = nullptr;
 
+#if 0 // Now defined in header
 typedef struct BackendContext_DX12 {
 
     // store for resources and resourceViews
@@ -189,6 +190,7 @@ typedef struct BackendContext_DX12 {
     std::mutex                  constantBufferMutex;
 
 } BackendContext_DX12;
+#endif
 
 static uint32_t getFreeBindlessDescriptorBlock(BackendContext_DX12 *context, uint32_t size, uint32_t effectId)
 {
