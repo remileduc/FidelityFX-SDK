@@ -491,7 +491,7 @@ bool ffxIsSurfaceFormatSRGB(FfxSurfaceFormat fmt)
     case (FFX_SURFACE_FORMAT_UNKNOWN):
         return false;
     default:
-        FFX_ASSERT_MESSAGE(false, "Format not yet supported");
+        //FFX_ASSERT_MESSAGE(false, "Format not yet supported");
         return false;
     }
 }
@@ -586,6 +586,14 @@ VkFormat ffxGetVkFormatFromSurfaceFormat(FfxSurfaceFormat fmt)
         return VK_FORMAT_R32_SFLOAT;
     case(FFX_SURFACE_FORMAT_R9G9B9E5_SHAREDEXP):
         return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
+    case (FFX_SURFACE_FORMAT_D32_FLOAT):
+        return VK_FORMAT_D32_SFLOAT;
+    case (FFX_SURFACE_FORMAT_D32_FLOAT_S8_UINT):
+        return VK_FORMAT_D32_SFLOAT_S8_UINT;
+    case (FFX_SURFACE_FORMAT_D24_UNORM):
+        return VK_FORMAT_X8_D24_UNORM_PACK32;
+    case (FFX_SURFACE_FORMAT_D24_UNORM_S8_UINT):
+        return VK_FORMAT_D24_UNORM_S8_UINT;
 
     default:
         FFX_ASSERT_MESSAGE(false, "Format not yet supported");
@@ -653,6 +661,14 @@ VkFormat ffxGetVKUAVFormatFromSurfaceFormat(FfxSurfaceFormat fmt)
         return VK_FORMAT_R32_SFLOAT;
     case(FFX_SURFACE_FORMAT_R9G9B9E5_SHAREDEXP):
         return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
+    case (FFX_SURFACE_FORMAT_D32_FLOAT):
+        return VK_FORMAT_D32_SFLOAT;
+    case (FFX_SURFACE_FORMAT_D32_FLOAT_S8_UINT):
+        return VK_FORMAT_D32_SFLOAT_S8_UINT;
+    case (FFX_SURFACE_FORMAT_D24_UNORM):
+        return VK_FORMAT_X8_D24_UNORM_PACK32;
+    case (FFX_SURFACE_FORMAT_D24_UNORM_S8_UINT):
+        return VK_FORMAT_D24_UNORM_S8_UINT;
 
     default:
         FFX_ASSERT_MESSAGE(false, "Format not yet supported");
@@ -713,9 +729,16 @@ FfxSurfaceFormat ffxGetSurfaceFormatVK(VkFormat fmt)
     case VK_FORMAT_R32_SFLOAT:
         return FFX_SURFACE_FORMAT_R32_FLOAT;
     case VK_FORMAT_D32_SFLOAT:
-        return FFX_SURFACE_FORMAT_R32_FLOAT;
+        return FFX_SURFACE_FORMAT_D32_FLOAT;
     case VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:
         return FFX_SURFACE_FORMAT_R9G9B9E5_SHAREDEXP;
+    case VK_FORMAT_D32_SFLOAT_S8_UINT:
+        return FFX_SURFACE_FORMAT_D32_FLOAT_S8_UINT;
+    case VK_FORMAT_X8_D24_UNORM_PACK32:
+        return FFX_SURFACE_FORMAT_D24_UNORM;
+    case VK_FORMAT_D24_UNORM_S8_UINT:
+        return FFX_SURFACE_FORMAT_D24_UNORM_S8_UINT;
+
     case VK_FORMAT_UNDEFINED:
         return FFX_SURFACE_FORMAT_UNKNOWN;
 
@@ -1100,7 +1123,7 @@ void addBarrier(BackendContext_VK* backendContext, FfxResourceInternal* resource
         FfxResourceStates& curState = backendContext->pResources[resource->internalIndex].currentState;
 
         VkImageSubresourceRange range;
-        range.aspectMask = FFX_CONTAINS_FLAG(ffxResource.resourceDescription.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
+        range.aspectMask = FFX_CONTAINS_FLAG(ffxResource.resourceDescription.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
         range.baseMipLevel = 0;
         range.levelCount = VK_REMAINING_MIP_LEVELS;
         range.baseArrayLayer = 0;
@@ -2600,7 +2623,7 @@ FfxErrorCode RegisterResourceVK(
         }
 
         imageViewCreateInfo.image = backendResource->imageResource;
-        imageViewCreateInfo.format = FFX_CONTAINS_FLAG(backendResource->resourceDescription.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_FORMAT_D32_SFLOAT : ffxGetVkFormatFromSurfaceFormat(backendResource->resourceDescription.format);
+        imageViewCreateInfo.format = ffxGetVkFormatFromSurfaceFormat(backendResource->resourceDescription.format);
         imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -2633,7 +2656,7 @@ FfxErrorCode RegisterResourceVK(
             backendResource->uavViewIndex = effectContext.nextDynamicResourceView[effectContext.frameIndex] - uavResourceViewCount + 1;
             backendResource->uavViewCount = uavResourceViewCount;
 
-            imageViewCreateInfo.format = FFX_CONTAINS_FLAG(backendResource->resourceDescription.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_FORMAT_D32_SFLOAT : ffxGetVKUAVFormatFromSurfaceFormat(backendResource->resourceDescription.format);
+            imageViewCreateInfo.format = ffxGetVKUAVFormatFromSurfaceFormat(backendResource->resourceDescription.format);
             imageViewCreateInfo.pNext  = nullptr;
 
             for (uint32_t mip = 0; mip < backendResource->resourceDescription.mipCount; ++mip)
@@ -2781,7 +2804,7 @@ FfxErrorCode registerStaticTextureSrv(BackendContext_VK* backendContext, const F
         }
 
         imageViewCreateInfo.image                           = vkImage;
-        imageViewCreateInfo.format                          = FFX_CONTAINS_FLAG(inResource->description.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_FORMAT_D32_SFLOAT : ffxGetVkFormatFromSurfaceFormat(inResource->description.format);
+        imageViewCreateInfo.format                          = ffxGetVkFormatFromSurfaceFormat(inResource->description.format);
         imageViewCreateInfo.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -2932,7 +2955,7 @@ FfxErrorCode registerStaticTextureUav(BackendContext_VK* backendContext, const F
         }
 
         imageViewCreateInfo.image                           = vkImage;
-        imageViewCreateInfo.format                          = FFX_CONTAINS_FLAG(inResource->description.usage, FFX_RESOURCE_USAGE_DEPTHTARGET) ? VK_FORMAT_D32_SFLOAT : ffxGetVkFormatFromSurfaceFormat(inResource->description.format);
+        imageViewCreateInfo.format                          = ffxGetVkFormatFromSurfaceFormat(inResource->description.format);
         imageViewCreateInfo.components.r                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.g                    = VK_COMPONENT_SWIZZLE_IDENTITY;
         imageViewCreateInfo.components.b                    = VK_COMPONENT_SWIZZLE_IDENTITY;
