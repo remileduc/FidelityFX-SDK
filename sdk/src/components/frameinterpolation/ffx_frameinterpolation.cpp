@@ -232,6 +232,7 @@ static uint32_t getPipelinePermutationFlags(uint32_t contextFlags, FfxPass, bool
     uint32_t flags = 0;
     flags |= (contextFlags & FFX_FRAMEINTERPOLATION_ENABLE_DISPLAY_RESOLUTION_MOTION_VECTORS) ? 0 : FRAMEINTERPOLATION_SHADER_PERMUTATION_LOW_RES_MOTION_VECTORS;
     flags |= (contextFlags & FFX_FRAMEINTERPOLATION_ENABLE_JITTER_MOTION_VECTORS) ? FRAMEINTERPOLATION_SHADER_PERMUTATION_JITTER_MOTION_VECTORS : 0;
+    flags |= (contextFlags & FFX_FRAMEINTERPOLATION_ENABLE_PREDILATED_MOTION_VECTORS) ? FRAMEINTERPOLATION_SHADER_PERMUTATION_PREDILATED_MOTION_VECTORS : 0;
     flags |= (contextFlags & FFX_FRAMEINTERPOLATION_ENABLE_DEPTH_INVERTED) ? FRAMEINTERPOLATION_SHADER_PERMUTATION_DEPTH_INVERTED : 0;
     flags |= (force64) ? FRAMEINTERPOLATION_SHADER_PERMUTATION_FORCE_WAVE64 : 0;
     flags |= (fp16) ? FRAMEINTERPOLATION_SHADER_PERMUTATION_ALLOW_FP16 : 0;
@@ -989,15 +990,15 @@ FFX_API FfxErrorCode ffxFrameInterpolationDispatch(FfxFrameInterpolationContext*
 
     if (contextPrivate->constants.HUDLessAttachedFactor == 1) {
 
-        FFX_ASSERT_MESSAGE(contextPrivate->contextDescription.previousInterpolationSourceFormat == params->currentBackBuffer_HUDLess.description.format,
-                           "Dispatch FI param currentBackBuffer_HUDLess format and Create FG Context's hudlessBackBufferFormat have to be identical. Otherwise, CopyTextureRegion from FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE to FI_PreviousInterpolationSource would fail");
+        //FFX_ASSERT_MESSAGE(contextPrivate->contextDescription.previousInterpolationSourceFormat == params->currentBackBuffer_HUDLess.description.format,
+        //                   "Dispatch FI param currentBackBuffer_HUDLess format and Create FG Context's hudlessBackBufferFormat have to be identical. Otherwise, CopyTextureRegion from FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE to FI_PreviousInterpolationSource would fail");
 
         contextPrivate->contextDescription.backendInterface.fpRegisterResource(&contextPrivate->contextDescription.backendInterface, &params->currentBackBuffer, contextPrivate->effectContextId, &contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PRESENT_BACKBUFFER]);
         contextPrivate->contextDescription.backendInterface.fpRegisterResource(&contextPrivate->contextDescription.backendInterface, &params->currentBackBuffer_HUDLess, contextPrivate->effectContextId, &contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE]);
     }
     else {
-        FFX_ASSERT_MESSAGE(contextPrivate->contextDescription.previousInterpolationSourceFormat == params->currentBackBuffer.description.format,
-                           "Dispatch FI param currentBackBuffer format and Create FG Context's backBufferFormat have to be identical. This assert can also be triggered if create FG Context with optional hudlessBackBufferFormat that is different from backBufferFormat and Dispatch FI param's currentBackBuffer_HUDLess is null.");
+        //FFX_ASSERT_MESSAGE(contextPrivate->contextDescription.previousInterpolationSourceFormat == params->currentBackBuffer.description.format,
+        //                   "Dispatch FI param currentBackBuffer format and Create FG Context's backBufferFormat have to be identical. This assert can also be triggered if create FG Context with optional hudlessBackBufferFormat that is different from backBufferFormat and Dispatch FI param's currentBackBuffer_HUDLess is null.");
         contextPrivate->contextDescription.backendInterface.fpRegisterResource(&contextPrivate->contextDescription.backendInterface, &params->currentBackBuffer, contextPrivate->effectContextId, &contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE]);
         contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PRESENT_BACKBUFFER] = contextPrivate->srvResources[FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_CURRENT_INTERPOLATION_SOURCE];
     }
